@@ -5,21 +5,11 @@ from typing import Any, Callable, List, Optional, Tuple
 
 from core.window import Window
 from ui import Button, Entry, Frame, ScrollBar, TreeView
-from threading import Thread
 
-
+        
 class ManagerView(TreeView):
     def __init__(self, master: App) -> None:
         super().__init__(master, columns=("question", "answer"), show="headings")
-
-        questions = (
-            ("Are you idiot?", "Yes"),
-            ("Are you gay?", "Yes"),
-            ("Are you dumbass?", "Yes"),
-            ("Are you cool?", "No"),
-        )
-        for values in questions:
-            self.insert_values(values)
 
         # self.bind(
         #     "<Double-1>",
@@ -47,7 +37,7 @@ class ManagerView(TreeView):
 
         self.entry.bind("<FocusIn>", self.__on_focus)
         self.entry.bind("<Return>", self.__on_enter)
-
+    
     def __on_focus(self, event: tk.Event) -> None:
         if not self.selected_pos:
             return
@@ -61,7 +51,7 @@ class ManagerView(TreeView):
     def __on_enter(self, event: tk.Event) -> None:
         if not self.entry.get().replace(" ", ""):
             return
-        
+
         if self.selected_pos is None:
             item_id = self.insert_values((self.entry.get(), ""))
             self.selection_set(item_id)
@@ -104,19 +94,11 @@ class ManagerView(TreeView):
     def insert_values(self, values: Tuple[Any, ...]) -> str:
         return self.insert("", tk.END, values=values)
 
-    # def on_add(self) -> None:
-    #     ...
-
     def on_delete(self) -> None:
         selected_items = self.selection()
         if selected_items:
             for item in selected_items:
                 self.delete(item)
-
-    # def on_edit(self) -> None:
-    #     if not self.select_pos:
-    #         return
-    #     self.master.entry.focus() # type: ignore
 
     def on_press_at(self, event: tk.Event) -> None:
         self.selected_pos = (
@@ -190,6 +172,7 @@ class App(Window):
         self.rframe.add_button("Start Now", lambda: print("Pressed!"))
         self.rframe.add_button("Import", lambda: print("Pressed!"))
         self.rframe.add_button("Export", lambda: print("Pressed!"))
+        self.rframe.add_button("Help", lambda: print("Pressed!"))
         self.rframe.grid(column=2, row=0, padx=5, pady=10, ipadx=2.5, sticky=tk.N)
 
         # Bottom frame
