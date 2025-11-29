@@ -27,7 +27,7 @@ class ManagerView(TreeView):
         #   It is not triggered if you turn on Caps lock
         # self.bind("<Control-a>", lambda event: self.selection_set(self.get_children()))
 
-        self.selected_pos: Optional[Tuple[str, int]] = None
+        self.selected_col: Optional[int] = None
 
         self.entry = Entry(
             self.master,
@@ -43,36 +43,48 @@ class ManagerView(TreeView):
 
         self.master.bind("<ButtonPress-1>", self.__on_click)
         self.master.bind("<Delete>", self.__on_delete)
-        
+    
+    @property
+    def selected_item(self) -> str:
+        items = self.selection()
+        if not items:
+            return ""
+        return items[-1]
     
     def __on_click(self, event: tk.Event) -> None:
-        row = self.identify_row(event.y)
         column = self.identify_column(event.x)
         
-        if row == "" or column == "":
-            for row in self.selection():
-                self.selection_remove(row)
-                self.selected_pos = None
+        if not column:
+            for item_id in self.selection():
+                self.selection_remove(item_id)
+                self.selected_col = None
             return
         
-        self.selected_pos = (row, int(column[1:]) - 1)
+        self.selected_col = int(column[1:]) - 1
         self.entry.focus()
-    
     
     def __on_delete(self, event: tk.Event) -> None:
         selected_items = self.selection()
-        if selected_items:
-            for item in selected_items:
-                self.delete(item)
-        self.selected_pos = None
+        if not selected_items:
+            return
+        items = self.get_children()
+        iitem = items.index(self.selected_item)
+        
+        for item in selected_items:
+            self.delete(item)
+        
+        if len(self.items) > iitem:
+            self.selection_add(self.get_children()[iitem])
+        
+        self.selected_col = None
         self.entry.clear()
     
     def __on_focus_entry(self, event: tk.Event) -> None:
-        if not self.selected_pos:
+        item_id = self.selected_item
+        if not (self.selected_col and item_id):
             return
 
-        item_id, col_index = self.selected_pos
-        value = self.get_values(item_id)[col_index]
+        value = self.get_values(item_id)[self.selected_col]
 
         self.entry.set(value)
     
@@ -80,28 +92,26 @@ class ManagerView(TreeView):
         if not self.entry.get().replace(" ", ""):
             return
 
-        if self.selected_pos is None:
+        if not (self.selected_col and self.selected_item):
             item_id = self.insert_values((self.entry.get(), ""))
             self.selection_set(item_id)
-            self.selected_pos = (item_id, 1)
+            self.selected_col = 1
             self.__on_focus_entry(event)
         else:
-            item_id, col_index = self.selected_pos
-            if col_index == 1:
-                self.appdata.save(self.items)
-
-            self.selection_remove(item_id)
-            self.selected_pos = None
+            self.selection_remove(self.selected_item)
+            self.selected_col = None
+        
         self.entry.clear()
+        self.appdata.save(self.items)
 
     def __validate(self, new_value: str) -> bool:
-        if self.selected_pos is None:
+        item_id = self.selected_item
+        
+        if not (self.selected_col and item_id):
             return True
 
-        item_id, col_index = self.selected_pos
-
         values = list(self.get_values(item_id))
-        values[col_index] = new_value
+        values[self.selected_col] = new_value
 
         self.item(item_id, values=tuple(values))
 
