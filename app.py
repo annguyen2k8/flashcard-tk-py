@@ -6,7 +6,7 @@ from typing import Any, Callable, List, Optional, Tuple
 from core.window import Window
 from ui import Button, Entry, Frame, ScrollBar, TreeView
 
-        
+
 class ManagerView(TreeView):
     def __init__(self, master: App) -> None:
         super().__init__(master, columns=("question", "answer"), show="headings")
