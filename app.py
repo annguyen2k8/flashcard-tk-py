@@ -5,6 +5,7 @@ from typing import Any, Callable, List, Optional, Tuple
 
 from core.window import Window
 from ui import Button, Entry, Frame, ScrollBar, TreeView
+from utils import Appdata
 
 
 class ManagerView(TreeView):
@@ -16,9 +17,7 @@ class ManagerView(TreeView):
         #     lambda event: self.entry_at(event.x, event.y)
         # )
 
-        self.bind("<ButtonPress-1>", self.on_press_at)
-
-        self.bind("<Delete>", lambda event: self.on_delete())
+        self.bind("<Delete>", self.__on_delete)
 
         # The problem:
         #   It is not triggered if you turn on Caps lock
@@ -35,20 +34,20 @@ class ManagerView(TreeView):
         self.entry.grid(column=1, row=1, sticky=tk.EW, padx=10, pady=10)
         self.entry.focus_set()
 
-        self.entry.bind("<FocusIn>", self.__on_focus)
-        self.entry.bind("<Return>", self.__on_enter)
-    
-    def __on_focus(self, event: tk.Event) -> None:
+        self.entry.bind("<FocusIn>", self.__on_focus_entry)
+        self.entry.bind("<Return>", self.__on_enter_entry)
+        
+
+    def __on_focus_entry(self, event: tk.Event) -> None:
         if not self.selected_pos:
             return
 
         item_id, col_index = self.selected_pos
+        value = self.get_values(item_id)[col_index]
 
-        values = self.get_values(item_id)
-
-        self.entry.set(values[col_index])
-
-    def __on_enter(self, event: tk.Event) -> None:
+        self.entry.set(value)
+    
+    def __on_enter_entry(self, event: tk.Event) -> None:
         if not self.entry.get().replace(" ", ""):
             return
 
@@ -56,7 +55,7 @@ class ManagerView(TreeView):
             item_id = self.insert_values((self.entry.get(), ""))
             self.selection_set(item_id)
             self.selected_pos = (item_id, 1)
-            self.__on_focus(event)
+            self.__on_focus_entry(event)
         else:
             item_id, col_index = self.selected_pos
 
@@ -77,6 +76,12 @@ class ManagerView(TreeView):
 
         return True
 
+    def __on_delete(self, event: tk.Event) -> None:
+        selected_items = self.selection()
+        if selected_items:
+            for item in selected_items:
+                self.delete(item)
+
     @property
     def length(self) -> int:
         return len(self.get_children())
@@ -89,25 +94,11 @@ class ManagerView(TreeView):
         self.item(item_id, values=values)
 
     def get_values(self, item_id: str) -> Tuple[Any, ...]:
-        return tuple(self.item(item_id, "values"))
+        values = tuple(self.item(item_id, "values"))
+        return values if values else ("", "")
 
     def insert_values(self, values: Tuple[Any, ...]) -> str:
         return self.insert("", tk.END, values=values)
-
-    def on_delete(self) -> None:
-        selected_items = self.selection()
-        if selected_items:
-            for item in selected_items:
-                self.delete(item)
-
-    def on_press_at(self, event: tk.Event) -> None:
-        self.selected_pos = (
-            self.identify_row(event.y),
-            int(self.identify_column(event.x)[1:]) - 1,
-        )
-        if self.selected_pos[0] == "":
-            return
-        self.entry.focus()
 
     def add(self, values: Tuple[Any, ...]) -> str:
         return self.insert("", tk.END, values=values)
@@ -161,6 +152,8 @@ class App(Window):
         self.manager = ManagerView(self)
         self.manager.grid(column=1, row=0, padx=10, pady=10)
 
+        self.appdata = Appdata("jalt")
+
         # ------- NOTE: I will make this UI to be better soon!
 
         # self.scrollbar = ScrollBar(self, orient=tk.VERTICAL, command=self.manager.yview)
@@ -181,6 +174,21 @@ class App(Window):
         # self.bframe.add_button("Delete", self.manager.on_delete)
         # self.bframe.add_button("Edit", self.manager.on_edit)
         # self.bframe.grid(column=1, row=2, columnspan=2, padx=7.5, pady=10, sticky=tk.EW)
+        
+
+        self.bind("<ButtonPress-1>", self.__on_click)
+    
+    def __on_click(self, event: tk.Event) -> None:
+        row = self.manager.identify_row(event.y)
+        column = self.manager.identify_column(event.x)
+        
+        if row == "" or column == "":
+            for row in self.manager.selection():
+                self.manager.selection_remove(row)
+            return
+        
+        self.manager.selected_pos = (row, int(column[1:]) - 1)
+        self.manager.entry.focus()
 
     def mainloop(self, n: int = 0) -> None:
         return super().mainloop(n)
