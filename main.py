@@ -1,5 +1,4 @@
 import sys
-from tkinter.messagebox import showerror
 
 from app import App
 

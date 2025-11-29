@@ -1,5 +1,8 @@
 import json
+import traceback
 from pathlib import Path
+from tkinter.messagebox import showerror
+from types import TracebackType
 from typing import Any, Callable, List, Optional, Tuple, Union
 
 
@@ -63,3 +66,13 @@ class Appdata:
 
         with open(filename, "w") as fp:
             json.dump(_items, fp)
+
+def report_callback_exception(
+    exc_type: type[BaseException], 
+    exc_value: BaseException, 
+    exc_traceback: Optional[TracebackType] = None
+    ) -> None:
+    showerror(
+        title=exc_type.__name__,
+        message="".join(traceback.format_exception(type(exc_value), exc_value, exc_value.__traceback__))
+        )

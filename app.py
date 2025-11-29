@@ -5,7 +5,7 @@ from typing import Any, Callable, List, Optional, Tuple
 
 from core.window import Window
 from ui import Button, Entry, Frame, ScrollBar, TreeView
-from utils import Appdata
+from utils import Appdata, report_callback_exception
 
 
 class ManagerView(TreeView):
@@ -141,6 +141,8 @@ class BottomFrame(RightFrame):
 class App(Window):
     def __init__(self, args: List[str]) -> None:
         super().__init__()
+        self.report_callback_exception = report_callback_exception
+        
         self.set_icon("assets/icon.ico")
         self.title = "Flashcard - JALT"
 
@@ -177,6 +179,7 @@ class App(Window):
         
 
         self.bind("<ButtonPress-1>", self.__on_click)
+        
     
     def __on_click(self, event: tk.Event) -> None:
         row = self.manager.identify_row(event.y)
