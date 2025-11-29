@@ -11,13 +11,17 @@ from utils import Appdata, report_callback_exception
 class ManagerView(TreeView):
     def __init__(self, master: App) -> None:
         super().__init__(master, columns=("question", "answer"), show="headings")
+        
+        self.appdata = master.appdata
 
+        items = self.appdata.load_save()
+        for values in items:
+            self.insert_values(values)
+        
         # self.bind(
         #     "<Double-1>",
         #     lambda event: self.entry_at(event.x, event.y)
         # )
-
-        self.bind("<Delete>", self.__on_delete)
 
         # The problem:
         #   It is not triggered if you turn on Caps lock
@@ -36,8 +40,33 @@ class ManagerView(TreeView):
 
         self.entry.bind("<FocusIn>", self.__on_focus_entry)
         self.entry.bind("<Return>", self.__on_enter_entry)
-        
 
+        self.master.bind("<ButtonPress-1>", self.__on_click)
+        self.master.bind("<Delete>", self.__on_delete)
+        
+    
+    def __on_click(self, event: tk.Event) -> None:
+        row = self.identify_row(event.y)
+        column = self.identify_column(event.x)
+        
+        if row == "" or column == "":
+            for row in self.selection():
+                self.selection_remove(row)
+                self.selected_pos = None
+            return
+        
+        self.selected_pos = (row, int(column[1:]) - 1)
+        self.entry.focus()
+    
+    
+    def __on_delete(self, event: tk.Event) -> None:
+        selected_items = self.selection()
+        if selected_items:
+            for item in selected_items:
+                self.delete(item)
+        self.selected_pos = None
+        self.entry.clear()
+    
     def __on_focus_entry(self, event: tk.Event) -> None:
         if not self.selected_pos:
             return
@@ -58,6 +87,8 @@ class ManagerView(TreeView):
             self.__on_focus_entry(event)
         else:
             item_id, col_index = self.selected_pos
+            if col_index == 1:
+                self.appdata.save(self.items)
 
             self.selection_remove(item_id)
             self.selected_pos = None
@@ -75,12 +106,6 @@ class ManagerView(TreeView):
         self.item(item_id, values=tuple(values))
 
         return True
-
-    def __on_delete(self, event: tk.Event) -> None:
-        selected_items = self.selection()
-        if selected_items:
-            for item in selected_items:
-                self.delete(item)
 
     @property
     def length(self) -> int:
@@ -142,6 +167,7 @@ class App(Window):
     def __init__(self, args: List[str]) -> None:
         super().__init__()
         self.report_callback_exception = report_callback_exception
+        self.appdata = Appdata("jalt")
         
         self.set_icon("assets/icon.ico")
         self.title = "Flashcard - JALT"
@@ -154,7 +180,6 @@ class App(Window):
         self.manager = ManagerView(self)
         self.manager.grid(column=1, row=0, padx=10, pady=10)
 
-        self.appdata = Appdata("jalt")
 
         # ------- NOTE: I will make this UI to be better soon!
 
@@ -177,21 +202,6 @@ class App(Window):
         # self.bframe.add_button("Edit", self.manager.on_edit)
         # self.bframe.grid(column=1, row=2, columnspan=2, padx=7.5, pady=10, sticky=tk.EW)
         
-
-        self.bind("<ButtonPress-1>", self.__on_click)
-        
-    
-    def __on_click(self, event: tk.Event) -> None:
-        row = self.manager.identify_row(event.y)
-        column = self.manager.identify_column(event.x)
-        
-        if row == "" or column == "":
-            for row in self.manager.selection():
-                self.manager.selection_remove(row)
-            return
-        
-        self.manager.selected_pos = (row, int(column[1:]) - 1)
-        self.manager.entry.focus()
 
     def mainloop(self, n: int = 0) -> None:
         return super().mainloop(n)
