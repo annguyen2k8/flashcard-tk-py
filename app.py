@@ -6,18 +6,16 @@ from typing import Any, Callable, List, Optional, Tuple
 from core.window import Window
 from ui import Button, Entry, Frame, ScrollBar, TreeView
 from utils import Appdata, report_callback_exception
+import tkinter.filedialog as fd
 
 
 class ManagerView(TreeView):
-    def __init__(self, master: App) -> None:
+    def __init__(self, master: App):
         super().__init__(master, columns=("question", "answer"), show="headings")
-        
-        self.appdata = master.appdata
 
-        items = self.appdata.load_save()
-        for values in items:
-            self.insert_values(values)
-        
+        self.appdata = master.appdata
+        self.set_items(self.appdata.load_save())
+
         # self.bind(
         #     "<Double-1>",
         #     lambda event: self.entry_at(event.x, event.y)
@@ -43,74 +41,67 @@ class ManagerView(TreeView):
 
         self.master.bind("<ButtonPress-1>", self.__on_click)
         self.master.bind("<Delete>", self.__on_delete)
-    
-    @property
-    def selected_item(self) -> str:
-        items = self.selection()
-        if not items:
-            return ""
-        return items[-1]
-    
-    def __on_click(self, event: tk.Event) -> None:
+
+    def __on_click(self, event: tk.Event):
         column = self.identify_column(event.x)
-        
+
         if not column:
             for item_id in self.selection():
                 self.selection_remove(item_id)
                 self.selected_col = None
             return
-        
+
         self.selected_col = int(column[1:]) - 1
         self.entry.focus()
-    
-    def __on_delete(self, event: tk.Event) -> None:
+
+    def __on_delete(self, event: tk.Event):
         selected_items = self.selection()
         if not selected_items:
             return
         items = self.get_children()
         iitem = items.index(self.selected_item)
-        
-        for item in selected_items:
-            self.delete(item)
-        
+
+        for item_id in selected_items:
+            self.delete_item(item_id)
+
         if len(self.items) > iitem:
             self.selection_add(self.get_children()[iitem])
-        
+
         self.selected_col = None
         self.entry.clear()
-    
-    def __on_focus_entry(self, event: tk.Event) -> None:
+
+    def __on_focus_entry(self, event: tk.Event):
         item_id = self.selected_item
         if not (self.selected_col and item_id):
             return
 
-        value = self.get_values(item_id)[self.selected_col]
+        value = self.get_item(item_id)[self.selected_col]
 
         self.entry.set(value)
-    
-    def __on_enter_entry(self, event: tk.Event) -> None:
+
+    def __on_enter_entry(self, event: tk.Event):
         if not self.entry.get().replace(" ", ""):
             return
 
         if not (self.selected_col and self.selected_item):
-            item_id = self.insert_values((self.entry.get(), ""))
+            item_id = self.insert_item((self.entry.get(), ""))
             self.selection_set(item_id)
             self.selected_col = 1
             self.__on_focus_entry(event)
         else:
             self.selection_remove(self.selected_item)
             self.selected_col = None
-        
+
         self.entry.clear()
         self.appdata.save(self.items)
 
     def __validate(self, new_value: str) -> bool:
         item_id = self.selected_item
-        
+
         if not (self.selected_col and item_id):
             return True
 
-        values = list(self.get_values(item_id))
+        values = list(self.get_item(item_id))
         values[self.selected_col] = new_value
 
         self.item(item_id, values=tuple(values))
@@ -125,18 +116,34 @@ class ManagerView(TreeView):
     def items(self) -> List[Tuple[str, ...]]:
         return [tuple(self.item(row, "values")) for row in self.get_children()]
 
-    def set_values(self, item_id: str, values: Tuple[Any, ...]):
+    @property
+    def selected_item(self) -> str:
+        items = self.selection()
+        if not items:
+            return ""
+        return items[-1]
+
+    def set_item(self, item_id: str, values: Tuple[Any, ...]):
         self.item(item_id, values=values)
 
-    def get_values(self, item_id: str) -> Tuple[Any, ...]:
+    def get_item(self, item_id: str) -> Tuple[Any, ...]:
         values = tuple(self.item(item_id, "values"))
         return values if values else ("", "")
 
-    def insert_values(self, values: Tuple[Any, ...]) -> str:
+    def insert_item(self, values: Tuple[Any, ...]) -> str:
         return self.insert("", tk.END, values=values)
 
-    def add(self, values: Tuple[Any, ...]) -> str:
-        return self.insert("", tk.END, values=values)
+    def delete_item(self, item_id: str):
+        self.delete(item_id)
+
+    def clear_items(self):
+        for item_id in self.get_children():
+            self.delete_item(item_id)
+
+    def set_items(self, items: List[Tuple[str, ...]]) -> None:
+        self.clear_items()
+        for values in items:
+            self.insert_item(values)
 
 
 class RightFrame(Frame):
@@ -146,7 +153,7 @@ class RightFrame(Frame):
         super().__init__(master, width=width)
         self.buttons = []
 
-    def add_button(self, text: str, func: Callable) -> None:
+    def add_button(self, text: str, func: Callable):
         button = Button(
             self,
             text=text,
@@ -160,7 +167,7 @@ class RightFrame(Frame):
 
 
 class BottomFrame(RightFrame):
-    def add_button(self, text: str, func: Callable) -> None:
+    def add_button(self, text: str, func: Callable):
         button = Button(
             self,
             text=text,
@@ -174,11 +181,11 @@ class BottomFrame(RightFrame):
 
 
 class App(Window):
-    def __init__(self, args: List[str]) -> None:
+    def __init__(self, args: List[str]):
         super().__init__()
         self.report_callback_exception = report_callback_exception
         self.appdata = Appdata("jalt")
-        
+
         self.set_icon("assets/icon.ico")
         self.title = "Flashcard - JALT"
 
@@ -190,8 +197,7 @@ class App(Window):
         self.manager = ManagerView(self)
         self.manager.grid(column=1, row=0, padx=10, pady=10)
 
-
-        # ------- NOTE: I will make this UI to be better soon!
+        # NOTE: I will improve* this UI soon!
 
         # self.scrollbar = ScrollBar(self, orient=tk.VERTICAL, command=self.manager.yview)
         # self.manager.configure(yscrollcommand=self.scrollbar.set)
@@ -200,8 +206,8 @@ class App(Window):
         # Right frame
         self.rframe = RightFrame(self)
         self.rframe.add_button("Start Now", lambda: print("Pressed!"))
-        self.rframe.add_button("Import", lambda: print("Pressed!"))
-        self.rframe.add_button("Export", lambda: print("Pressed!"))
+        self.rframe.add_button("Import", self.__import_file)
+        self.rframe.add_button("Export", self.__export_file)
         self.rframe.add_button("Help", lambda: print("Pressed!"))
         self.rframe.grid(column=2, row=0, padx=5, pady=10, ipadx=2.5, sticky=tk.N)
 
@@ -211,7 +217,36 @@ class App(Window):
         # self.bframe.add_button("Delete", self.manager.on_delete)
         # self.bframe.add_button("Edit", self.manager.on_edit)
         # self.bframe.grid(column=1, row=2, columnspan=2, padx=7.5, pady=10, sticky=tk.EW)
-        
 
-    def mainloop(self, n: int = 0) -> None:
+    filetypes: Tuple[Tuple[str, str]] = (("JSON files", "*.jalt.json"),)
+    defaultextension: str = "*.jalt.json"
+
+    def __import_file(self):
+        filename = fd.askopenfilename(
+            title="Import a file",
+            initialdir=self.appdata.save_path,
+            filetypes=self.filetypes,
+        )
+        if not filename:
+            return
+
+        items = self.appdata.import_save(filename=filename)
+        self.manager.set_items(items)
+
+    def __export_file(self):
+        filename = fd.asksaveasfilename(
+            title="Export a file",
+            initialdir=self.appdata.save_path,
+            defaultextension=self.defaultextension,
+            filetypes=self.filetypes,
+        )
+        if not filename:
+            return
+
+        self.appdata.export_save(
+            self.manager.items,
+            filename=filename,
+        )
+
+    def mainloop(self, n: int = 0):
         return super().mainloop(n)

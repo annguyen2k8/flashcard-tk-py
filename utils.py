@@ -4,7 +4,7 @@ from pathlib import Path
 from tkinter.messagebox import showerror
 from types import TracebackType
 from typing import Any, Callable, List, Optional, Tuple, Union
-
+import sys
 
 def filename(*, is_file: bool = True, ext: Optional[str] = None) -> Callable:
     def decorator(func: Callable) -> Callable:
@@ -26,18 +26,24 @@ def filename(*, is_file: bool = True, ext: Optional[str] = None) -> Callable:
 
 
 class Appdata:
-    def __init__(self, name: str) -> None:
+    def __init__(self, name: str):
         self.path = Path.home() / f".{name}"
         self.path.mkdir(exist_ok=True)
         
-        self.save_file = self.path / "save.json"
+        self.save_file = self.path / ".temp.json"
         if not self.save_file.exists():
             self.save()
+        
+        if sys.platform == "win32":
+            self.save_path = Path.home() / "Documents"
+        else:
+            self.save_path = self.path / "saves"
+        self.save_path.mkdir(exist_ok=True)
     
     def save(
         self,
         items: List[Tuple[str, ...]] = [],
-    ) -> None:
+    ):
         return self.export_save(items, filename=self.save_file)
 
     def load_save(self) -> List[Tuple[str, ...]]:
@@ -59,7 +65,7 @@ class Appdata:
     def export_save(
         self, items: List[Tuple[str, ...]] = [], *,
         filename: Union[str, Path]
-        ) -> None:
+        ):
         _items = []
         for question, answer in items:
             _items.append({"q": question, "a": answer})
@@ -71,7 +77,7 @@ def report_callback_exception(
     exc_type: type[BaseException], 
     exc_value: BaseException, 
     exc_traceback: Optional[TracebackType] = None
-    ) -> None:
+    ):
     showerror(
         title=exc_type.__name__,
         message="".join(traceback.format_exception(type(exc_value), exc_value, exc_value.__traceback__))
