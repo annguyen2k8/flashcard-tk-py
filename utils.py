@@ -1,10 +1,11 @@
 import json
+import sys
 import traceback
 from pathlib import Path
 from tkinter.messagebox import showerror
 from types import TracebackType
 from typing import Any, Callable, List, Optional, Tuple, Union
-import sys
+
 
 def filename(*, is_file: bool = True, ext: Optional[str] = None) -> Callable:
     def decorator(func: Callable) -> Callable:

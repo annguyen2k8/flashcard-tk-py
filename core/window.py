@@ -1,12 +1,15 @@
 import sys
 import threading
 import tkinter
+import tkinter as tk
 from typing import Callable, Literal, Optional, Tuple, overload
 
 import darkdetect
-import pywinstyles
 import sv_ttk
+from PIL import Image, ImageTk
 
+if sys.platform == "win32":
+    import pywinstyles
 
 class Window(tkinter.Tk):
     @property
@@ -29,7 +32,15 @@ class Window(tkinter.Tk):
             self.wm_resizable(value[0], value[1])
 
     def set_icon(self, path: str):
-        self.wm_iconbitmap(path)
+        try:
+            if sys.platform == "win32":
+                image = Image.open(path)
+                photo = ImageTk.PhotoImage(image)
+                self.wm_iconphoto(True, photo)
+            else:
+                self.wm_iconbitmap(path)
+        except FileNotFoundError:
+            print("Icon file not found. Using default icon.")
 
     @property
     def geometry(self) -> Tuple[int, int, int, int]:
@@ -121,16 +132,17 @@ class Window(tkinter.Tk):
         theme = theme.lower()
         sv_ttk.set_theme(theme, self)
 
-        version = sys.getwindowsversion()
-        if version.major == 10 and version.build >= 22000:
-            pywinstyles.change_header_color(
-                self, "#1c1c1c" if theme == "dark" else "#fafafa"
-            )
-        elif version.major == 10:
-            pywinstyles.apply_style(self, "dark" if theme == "dark" else "normal")
+        if sys.platform == "win32":
+            version = sys.getwindowsversion()
+            if version.major == 10 and version.build >= 22000:
+                pywinstyles.change_header_color(
+                    self, "#1c1c1c" if theme == "dark" else "#fafafa"
+                )
+            elif version.major == 10:
+                pywinstyles.apply_style(self, "dark" if theme == "dark" else "normal")
 
-            self.wm_attributes("-alpha", 0.99)
-            self.wm_attributes("-alpha", 1)
+                self.wm_attributes("-alpha", 0.99)
+                self.wm_attributes("-alpha", 1)
 
         self.update()
 
@@ -142,6 +154,8 @@ class Window(tkinter.Tk):
             from ctypes import windll
 
             windll.shcore.SetProcessDpiAwareness(1)
+        except ImportError:
+            pass
         finally:
             self.set_theme(darkdetect.theme())  # type: ignore
 

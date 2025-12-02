@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import tkinter as tk
+import tkinter.filedialog as fd
 from typing import Any, Callable, List, Optional, Tuple
 
 from core.window import Window
 from ui import Button, Entry, Frame, ScrollBar, TreeView
 from utils import Appdata, report_callback_exception
-import tkinter.filedialog as fd
 
 
 class ManagerView(TreeView):
@@ -186,7 +186,7 @@ class App(Window):
         self.report_callback_exception = report_callback_exception
         self.appdata = Appdata("jalt")
 
-        self.set_icon("assets/icon.ico")
+        self.set_icon("./assets/icon.png")
         self.title = "Flashcard - JALT"
 
         self.columnconfigure(0, weight=3)
