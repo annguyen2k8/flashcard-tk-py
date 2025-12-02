@@ -35,9 +35,8 @@ class Appdata:
         if not self.save_file.exists():
             self.save()
         
-        if sys.platform == "win32":
-            self.save_path = Path.home() / "Documents"
-        else:
+        self.save_path = Path.home() / "Documents"
+        if not self.save_path.exists():
             self.save_path = self.path / "saves"
         self.save_path.mkdir(exist_ok=True)
     
