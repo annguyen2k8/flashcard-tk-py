@@ -34,11 +34,11 @@ class Window(tkinter.Tk):
     def set_icon(self, path: str):
         try:
             if sys.platform == "win32":
+                self.wm_iconbitmap(path)
+            else:
                 image = Image.open(path)
                 photo = ImageTk.PhotoImage(image)
                 self.wm_iconphoto(True, photo)
-            else:
-                self.wm_iconbitmap(path)
         except FileNotFoundError:
             print("Icon file not found. Using default icon.")
 
