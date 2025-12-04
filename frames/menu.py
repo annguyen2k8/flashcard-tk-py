@@ -201,12 +201,14 @@ class MenuFrame(Frame):
         # self.manager.configure(yscrollcommand=self.scrollbar.set)
         # self.scrollbar.grid(column=0, row=0, padx=10, pady=50, ipady=50, sticky=tk.NS)
         
+        from .form import FormFrame
+        
         # Right frame
         self.rframe = RightFrame(self)
-        self.rframe.add_button("Start Now", lambda: print("Pressed!"))
+        self.rframe.add_button("Start Now", lambda: self.master.show(FormFrame))
         self.rframe.add_button("Import", self.on_import)
         self.rframe.add_button("Export", self.on_export)
-        self.rframe.add_button("Help", lambda: print("Pressed!"))
+        self.rframe.add_button("Help", lambda: ...)
         self.rframe.grid(column=2, row=0, padx=5, pady=10, ipadx=2.5, sticky=tk.N)
 
         # Bottom frame
