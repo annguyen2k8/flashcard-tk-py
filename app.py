@@ -16,7 +16,6 @@ class App(Window):
         super().__init__()
         self.report_callback_exception = report_callback_exception
 
-        self.set_icon("./assets/icon.png")        
         self.title = "Flashcard - JALT"
         
         self.resizable = False

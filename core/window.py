@@ -11,6 +11,7 @@ from PIL import Image, ImageTk
 if sys.platform == "win32":
     import pywinstyles
 
+
 class Window(tkinter.Tk):
     @property
     def title(self) -> str:
@@ -31,14 +32,14 @@ class Window(tkinter.Tk):
         else:
             self.wm_resizable(value[0], value[1])
 
-    def set_icon(self, path: str):
+    def set_icon(self, name: str):
         try:
             if sys.platform == "win32":
-                self.wm_iconbitmap(path)
+                self.wm_iconbitmap(name + ".ico")
             else:
-                image = Image.open(path)
+                image = Image.open(name)
                 photo = ImageTk.PhotoImage(image)
-                self.wm_iconphoto(True, photo)
+                self.wm_iconphoto(True, photo  + ".png")
         except FileNotFoundError:
             print("Icon file not found. Using default icon.")
 
@@ -127,6 +128,8 @@ class Window(tkinter.Tk):
 
     def __init__(self) -> None:
         super().__init__()
+        
+        self.set_icon("assets/icon")
 
     def set_theme(self, theme: str):
         theme = theme.lower()
