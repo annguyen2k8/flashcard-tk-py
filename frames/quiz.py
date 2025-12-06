@@ -2,10 +2,9 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.messagebox import askyesno
 
-
-
-from ui import Frame, Button, LabelFrame, Entry, Label
 from app import App
+from ui import Button, Entry, Frame, Label, LabelFrame
+
 
 @App.register_frame
 class QuizFrame(Frame):

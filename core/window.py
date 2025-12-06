@@ -37,9 +37,9 @@ class Window(tkinter.Tk):
             if sys.platform == "win32":
                 self.wm_iconbitmap(name + ".ico")
             else:
-                image = Image.open(name)
+                image = Image.open(name  + ".png")
                 photo = ImageTk.PhotoImage(image)
-                self.wm_iconphoto(True, photo  + ".png")
+                self.wm_iconphoto(True, photo)
         except FileNotFoundError:
             print("Icon file not found. Using default icon.")
 

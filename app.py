@@ -1,13 +1,13 @@
 from __future__ import annotations
 
+import functools
 import tkinter as tk
-from typing import List, Type, Dict
+from typing import Dict, List, Type
 
 from core.window import Window
 from ui import Frame
 from utils import report_callback_exception
 
-import functools
 
 class App(Window):
     frames: Dict[str, Frame] = {}
@@ -23,7 +23,7 @@ class App(Window):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
-        import frames # Don't delete this line!
+        import frames  # Don't delete this line!
         
         for frame in self.__frames:
             _frame = frame(self)

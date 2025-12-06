@@ -1,7 +1,6 @@
-from typing import Optional
-
 import tkinter as tk
 from tkinter import ttk
+from typing import Optional
 
 
 class Label(ttk.Label):

@@ -1,13 +1,11 @@
 import sys
-
 import tkinter as tk
 import tkinter.filedialog as fd
 from typing import Any, Callable, List, Optional, Tuple
 
+from app import App
 from ui import Button, Entry, Frame, ScrollBar, TreeView
 from utils import Appdata
-
-from app import App
 
 
 class ManagerView(TreeView):
