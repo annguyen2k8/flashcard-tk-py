@@ -2,7 +2,7 @@ import sys
 
 import tkinter as tk
 import tkinter.filedialog as fd
-from typing import Any, Callable, List, Optional, Tuple, TYPE_CHECKING
+from typing import Any, Callable, List, Optional, Tuple
 
 from ui import Button, Entry, Frame, ScrollBar, TreeView
 from utils import Appdata
@@ -33,7 +33,6 @@ class ManagerView(TreeView):
             validate="key",
             validatecommand=(self.register(self.__validate), "%P"),
         )
-        self.entry.insert(0, "")
         self.entry.grid(column=1, row=1, sticky=tk.EW, padx=10, pady=10)
         self.entry.focus_set()
 
@@ -184,10 +183,11 @@ class BottomFrame(RightFrame):
 
 @App.register_frame
 class MenuFrame(Frame):
+    appdata: Appdata = Appdata("jalt")
     def __init__(self, master: App):
         super().__init__(master)
         
-        self.appdata = Appdata("jalt")
+        self.container = master
         
         self.columnconfigure(0, weight=3)
         self.rowconfigure(0, weight=4)
@@ -201,13 +201,11 @@ class MenuFrame(Frame):
         # self.manager.configure(yscrollcommand=self.scrollbar.set)
         # self.scrollbar.grid(column=0, row=0, padx=10, pady=50, ipady=50, sticky=tk.NS)
         
-        from .form import FormFrame
-        
         # Right frame
         self.rframe = RightFrame(self)
-        self.rframe.add_button("Start Now", lambda: self.master.show(FormFrame))
-        self.rframe.add_button("Import", self.on_import)
-        self.rframe.add_button("Export", self.on_export)
+        self.rframe.add_button("Start Now", self.__on_start)
+        self.rframe.add_button("Import", self.__on_import)
+        self.rframe.add_button("Export", self.__on_export)
         self.rframe.add_button("Help", lambda: ...)
         self.rframe.grid(column=2, row=0, padx=5, pady=10, ipadx=2.5, sticky=tk.N)
 
@@ -221,7 +219,7 @@ class MenuFrame(Frame):
     filetypes: Tuple[Tuple[str, str]] = (("JSON files", "*.jalt.json"),)
     defaultextension: str = "*.jalt.json"
 
-    def on_import(self):
+    def __on_import(self):
         filename = fd.askopenfilename(
             title="Import a file",
             initialdir=self.appdata.save_path,
@@ -233,7 +231,7 @@ class MenuFrame(Frame):
         items = self.appdata.import_save(filename=filename)
         self.manager.set_items(items)
 
-    def on_export(self):
+    def __on_export(self):
         filename = fd.asksaveasfilename(
             title="Export a file",
             initialdir=self.appdata.save_path,
@@ -247,3 +245,8 @@ class MenuFrame(Frame):
             self.manager.items,
             filename=filename,
         )
+    
+    def __on_start(self):
+        from .quiz import QuizFrame
+        
+        self.container.show(QuizFrame)

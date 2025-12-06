@@ -10,7 +10,7 @@ class TreeView(ttk.Treeview):
         height: int = 10,
         show: Literal["tree", "headings", "tree headings", ""] = "",
         **kwargs
-     ) -> None:
+    ) -> None:
         super().__init__(
             master,
             columns=columns, 

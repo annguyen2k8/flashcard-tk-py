@@ -24,11 +24,14 @@ class App(Window):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
-        import frames
+        import frames # Don't delete this line!
         
         for frame in self.__frames:
             _frame = frame(self)
-            _frame.grid(row=0, column=0, sticky="nsew")
+            _frame.grid(
+                row=0, column=0,
+                sticky="nsew"
+                )
             
             self.frames[frame.__name__] = _frame
         
@@ -47,8 +50,13 @@ class App(Window):
         return method
         
     
-    def show(self, frame_cls: str):
+    def show(self, frame_cls: str) -> Frame:
         try:
-            self.frames[frame_cls.__name__].tkraise()
+            frame = self.frames[frame_cls.__name__]
+            
+            frame.tkraise()
+            frame.on_show()
+            
+            return frame
         except KeyError:
             pass
