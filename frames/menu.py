@@ -71,7 +71,7 @@ class ManagerView(TreeView):
 
     def __on_focus_entry(self, event: tk.Event):
         item_id = self.selected_item
-        if not (self.selected_col and item_id):
+        if not (self.selected_col and item_id is None):
             return
 
         value = self.get_item(item_id)[self.selected_col]
