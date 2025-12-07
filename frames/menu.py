@@ -35,7 +35,7 @@ class ManagerView(TreeView):
         self.entry.focus_set()
 
         self.entry.bind("<FocusIn>", self.__on_focus_entry)
-        self.entry.bind("<Return>", self.__on_enter_entry)
+        self.entry.bind("<Return>", self.__on_return)
 
         self.bind("<ButtonPress-1>", self.__on_click)
         self.bind("<Delete>", self.__on_delete)
@@ -78,7 +78,7 @@ class ManagerView(TreeView):
 
         self.entry.set(value)
 
-    def __on_enter_entry(self, event: tk.Event):
+    def __on_return(self, event: tk.Event):
         if not self.entry.get().replace(" ", ""):
             return
 
@@ -246,5 +246,5 @@ class MenuFrame(Frame):
     
     def __on_start(self):
         from .quiz import QuizFrame
-        
-        self.container.show(QuizFrame)
+
+        self.container.show(QuizFrame).start(self.manager.items)

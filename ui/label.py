@@ -12,3 +12,11 @@ class Label(ttk.Label):
             master,
             text=text
         )
+    
+    @property
+    def text(self) -> str:
+        return self["text"]
+    
+    @text.setter
+    def text(self, value: str):
+        self["text"] = value
