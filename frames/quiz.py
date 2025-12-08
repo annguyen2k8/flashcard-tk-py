@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from tkinter.messagebox import askyesno
+from tkinter.messagebox import askyesno, showinfo
 
 from app import App
 from ui import Button, Entry, Frame, Label, LabelFrame
@@ -49,6 +49,8 @@ class QuizFrame(Frame):
         self.lf.pack(
             padx=10, pady=10, fill=tk.X, expand=True, anchor=tk.CENTER
         )
+        
+        self.entry.bind("<Return>", self.__on_return)
     
     def on_show(self):
         self.entry.focus()
@@ -66,13 +68,29 @@ class QuizFrame(Frame):
         return self.__results
     
     @property
+    def total(self) -> int:
+        return len(self.results.keys())
+    
+    @property
     def answered(self) -> int:
-       return sum(status is not None for status in self.results.values())
+        count = 0
+        for val in self.results.values():
+            if val is None:
+               continue
+            count += 1
+        return count
     
     @property
     def remaining(self) -> int:
-        return self.answered - self.answered
+        return self.total - self.answered
     
+    @property
+    def question(self) -> str:
+        return self.questions[self.index][0]
+    
+    @property
+    def answer(self) -> str:
+        return self.questions[self.index][1]
     
     def start(self, items: List[Tuple[str, ...]]):
         self.__questions = items
@@ -86,17 +104,32 @@ class QuizFrame(Frame):
     
     def __update(self):
         self.lf.text = f"Question {self.index + 1}"
-        self.label.text = self.questions[self.index][0]
+        self.label.text = self.question
     
     def __next_question(self):
-        ...
+        self.__index += 1
+        self.__update()
+        self.entry.clear()
     
-    def __on_return(self):
-        if not self.entry.get().replace(" ", ""):
+    def __on_return(self, event: tk.Event):
+        answer = self.entry.get()
+        
+        if not answer.replace(" ", ""):
             return
         
-        ...
-
+        
+        result = answer.lower() == self.answer.lower()
+        
+        self.results[self.index] = result
+        
+        print(self.results, self.answered, self.remaining)
+        
+        if self.remaining != 0:
+            return self.__next_question()
+        
+        showinfo(message="Done!")
+        
+        
     def __on_quit(self) -> None:
         from .menu import MenuFrame
         
