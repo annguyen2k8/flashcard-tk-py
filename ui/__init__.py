@@ -1,17 +1,18 @@
-from .button import *
-from .entry import *
-from .frame import *
-from .label import *
-from .label_frame import *
-from .scrollbar import *
-from .treeview import *
+from .button import Button
+from .entry import Entry
+from .frame import Frame
+from .label import Label
+from .label_frame import LabelFrame
+from .scrollbar import ScrollBar
+from .treeview import TreeView
 
 __all__ = [
     "Button",
-    "Frame",
-    "TreeView",
-    "ScrollBar",
     "Entry",
+    "Frame",
     "Label",
-    "LabelFrame"
+    "LabelFrame",
+    "ScrollBar",
+    "TreeView",
+    
 ]

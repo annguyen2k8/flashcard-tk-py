@@ -1,21 +1,21 @@
+from __future__ import annotations
+
 import tkinter as tk
 from tkinter import ttk
 from tkinter.messagebox import askyesno, showinfo
+from typing import Callable, Dict, List, Optional, Tuple
 
-from app import App
+from managers import FrameManager
 from ui import Button, Entry, Frame, Label, LabelFrame
-from typing import List, Tuple, Dict
 
 
-@App.register_frame
-class QuizFrame(Frame):
+class QuizFrame(FrameManager.Frame):
     __questions: List[Tuple[str, ...]]
     __index: int
-    __results: Dict[int, bool]
+    __results: Dict[int, Optional[str]]
     
-    
-    def __init__(self, master: App):
-        super().__init__(master)
+    def __init__(self, manager: FrameManager, *args, **kwargs):
+        super().__init__(manager, *args, **kwargs)
         
         Button(
             self, text="Quit", 
@@ -92,6 +92,24 @@ class QuizFrame(Frame):
     def answer(self) -> str:
         return self.questions[self.index][1]
     
+    @property
+    def mistakes(self) -> Dict[int, bool]:
+        return self.filter_results(self.__is_wrong)
+    
+    def __is_wrong(self, index: int, answer: str) -> bool:
+        return not self.questions[index][1].lower() == answer.lower()
+    
+    @property
+    def total_mistakes(self) -> int:
+        return len(self.mistakes)
+    
+    def filter_results(self, func: Callable[[int, bool], bool]) -> Dict[int, bool]:
+        results = {}
+        for index, answer in self.results.items():
+            if func(index, answer):
+                results[index] = self.results[index]
+        return results
+    
     def start(self, items: List[Tuple[str, ...]]):
         self.__questions = items
         self.__index = 0
@@ -106,32 +124,29 @@ class QuizFrame(Frame):
         self.lf.text = f"Question {self.index + 1}"
         self.label.text = self.question
     
-    def __next_question(self):
-        self.__index += 1
-        self.__update()
-        self.entry.clear()
-    
     def __on_return(self, event: tk.Event):
         answer = self.entry.get()
         
         if not answer.replace(" ", ""):
             return
         
+        self.results[self.index] = answer
         
-        result = answer.lower() == self.answer.lower()
+        if not self.remaining:
+            return self.__on_result(event)
+
+        self.__next_question(event)
+    
+    def __next_question(self, event: tk.Event):
+        self.__index += 1
+        self.__update()
+        self.entry.clear()
+    
+    def __on_result(self, event: tk.Event):
+        ...
         
-        self.results[self.index] = result
-        
-        print(self.results, self.answered, self.remaining)
-        
-        if self.remaining != 0:
-            return self.__next_question()
-        
-        showinfo(message="Done!")
-        
-        
-    def __on_quit(self) -> None:
-        from .menu import MenuFrame
+    def __on_quit(self):
+        from frames.menu import MenuFrame
         
         if askyesno(message="Are you sure to quit?"):
-            self.container.show(MenuFrame)
+            self.manager.show(MenuFrame)

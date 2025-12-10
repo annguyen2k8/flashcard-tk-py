@@ -24,5 +24,3 @@ class Frame(ttk.Frame):
         )
         
         self.container = master
-    
-    def on_show(self): pass

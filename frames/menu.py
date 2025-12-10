@@ -1,19 +1,23 @@
+from __future__ import annotations
+
 import sys
 import tkinter as tk
 import tkinter.filedialog as fd
 from typing import Any, Callable, List, Optional, Tuple
 
-from app import App
+from managers import FrameManager
 from ui import Button, Entry, Frame, ScrollBar, TreeView
-from utils import Appdata
+from ui.buttons import HorizontalButtons, VerticalButtons
+
+# from utils import Appdata
 
 
 class ManagerView(TreeView):
-    def __init__(self, master: App):
+    def __init__(self, master: Optional[tk.Misc]):
         super().__init__(master, columns=("question", "answer"), show="headings")
 
-        self.appdata = master.appdata
-        self.set_items(self.appdata.load_save())
+        # self.appdata = master.appdata
+        # self.set_items(self.appdata.load_save())
 
         # self.bind(
         #     "<Double-1>",
@@ -67,7 +71,7 @@ class ManagerView(TreeView):
 
         self.selected_col = None
         self.entry.clear()
-        self.appdata.save(self.items)
+        # self.appdata.save(self.items)
 
     def __on_focus_entry(self, event: tk.Event):
         item_id = self.selected_item
@@ -92,7 +96,7 @@ class ManagerView(TreeView):
             self.selected_col = None
 
         self.entry.clear()
-        self.appdata.save(self.items)
+        # self.appdata.save(self.items)
 
     def __validate(self, new_value: str) -> bool:
         item_id = self.selected_item
@@ -144,54 +148,16 @@ class ManagerView(TreeView):
         for values in items:
             self.insert_item(values)
 
-
-class RightFrame(Frame):
-    buttons: List[Button]
-
-    def __init__(self, master: App, *, width: int = 15):
-        super().__init__(master, width=width)
-        self.buttons = []
-
-    def add_button(self, text: str, func: Callable):
-        button = Button(
-            self,
-            text=text,
-            command=func,
-            width=int(self["width"] * 0.8),
-        )
-        self.buttons.append(button)
-
-        for i, button in enumerate(self.buttons):
-            button.grid(column=0, row=i, pady=2.5)
-
-
-class BottomFrame(RightFrame):
-    def add_button(self, text: str, func: Callable):
-        button = Button(
-            self,
-            text=text,
-            command=func,
-            width=int(self["width"] * 0.8),
-        )
-        self.buttons.append(button)
-
-        for i, button in enumerate(self.buttons):
-            button.grid(column=i, row=0, padx=2.5)
-
-
-@App.register_frame
-class MenuFrame(Frame):
-    appdata: Appdata = Appdata("jalt")
-    def __init__(self, master: App):
-        super().__init__(master)
-        
-        self.container = master
+class MenuFrame(FrameManager.Frame):
+    # appdata: Appdata = Appdata("jalt")
+    def __init__(self, manager: FrameManager, *args, **kwargs):
+        super().__init__(manager, *args, **kwargs)
         
         self.columnconfigure(0, weight=3)
         self.rowconfigure(0, weight=4)
 
-        self.manager = ManagerView(self)
-        self.manager.grid(column=1, row=0, padx=10, pady=10)
+        self.editor = ManagerView(self)
+        self.editor.grid(column=1, row=0, padx=10, pady=10)
 
         # NOTE: I will improve* this UI soon!
 
@@ -200,7 +166,7 @@ class MenuFrame(Frame):
         # self.scrollbar.grid(column=0, row=0, padx=10, pady=50, ipady=50, sticky=tk.NS)
         
         # Right frame
-        self.rframe = RightFrame(self)
+        self.rframe = HorizontalButtons(self)
         self.rframe.add_button("Start Now", self.__on_start)
         self.rframe.add_button("Import", self.__on_import)
         self.rframe.add_button("Export", self.__on_export)
@@ -208,7 +174,7 @@ class MenuFrame(Frame):
         self.rframe.grid(column=2, row=0, padx=5, pady=10, ipadx=2.5, sticky=tk.N)
 
         # Bottom frame
-        # self.bframe = BottomFrame(self)
+        # self.bframe = VerticalButtons(self)
         # self.bframe.add_button("Add", self.manager.on_add)
         # self.bframe.add_button("Delete", self.manager.on_delete)
         # self.bframe.add_button("Edit", self.manager.on_edit)
@@ -218,6 +184,8 @@ class MenuFrame(Frame):
     defaultextension: str = "*.jalt.json"
 
     def __on_import(self):
+        pass
+    
         filename = fd.askopenfilename(
             title="Import a file",
             initialdir=self.appdata.save_path,
@@ -230,6 +198,8 @@ class MenuFrame(Frame):
         self.manager.set_items(items)
 
     def __on_export(self):
+        pass
+        
         filename = fd.asksaveasfilename(
             title="Export a file",
             initialdir=self.appdata.save_path,
@@ -245,6 +215,6 @@ class MenuFrame(Frame):
         )
     
     def __on_start(self):
-        from .quiz import QuizFrame
-
-        self.container.show(QuizFrame).start(self.manager.items)
+        from frames.quiz import QuizFrame
+        
+        self.manager.add(QuizFrame)
