@@ -3,5 +3,5 @@ from .quiz import QuizFrame
 
 __all__ = [
     "MenuFrame",
-    "FormFrame"
+    "QuizFrame"
 ]

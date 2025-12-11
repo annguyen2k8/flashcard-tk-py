@@ -5,7 +5,7 @@ from tkinter import ttk
 from tkinter.messagebox import askyesno, showinfo
 from typing import Callable, Dict, List, Optional, Tuple
 
-from managers import FrameManager
+from managers import FrameManager, FrameType
 from ui import Button, Entry, Frame, Label, LabelFrame
 
 
@@ -15,7 +15,7 @@ class QuizFrame(FrameManager.Frame):
     __results: Dict[int, Optional[str]]
     
     def __init__(self, manager: FrameManager, *args, **kwargs):
-        super().__init__(manager, *args, **kwargs)
+        super().__init__(manager, FrameType.QUIZ,*args, **kwargs)
         
         Button(
             self, text="Quit", 
@@ -146,7 +146,5 @@ class QuizFrame(FrameManager.Frame):
         ...
         
     def __on_quit(self):
-        from frames.menu import MenuFrame
-        
         if askyesno(message="Are you sure to quit?"):
-            self.manager.show(MenuFrame)
+            self.manager.show(FrameType.MENU)

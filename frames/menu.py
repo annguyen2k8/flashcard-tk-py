@@ -5,7 +5,7 @@ import tkinter as tk
 import tkinter.filedialog as fd
 from typing import Any, Callable, List, Optional, Tuple
 
-from managers import FrameManager
+from managers import FrameManager, FrameType
 from ui import Button, Entry, Frame, ScrollBar, TreeView
 from ui.buttons import HorizontalButtons, VerticalButtons
 
@@ -151,7 +151,7 @@ class ManagerView(TreeView):
 class MenuFrame(FrameManager.Frame):
     # appdata: Appdata = Appdata("jalt")
     def __init__(self, manager: FrameManager, *args, **kwargs):
-        super().__init__(manager, *args, **kwargs)
+        super().__init__(manager, FrameType.MENU, *args, **kwargs)
         
         self.columnconfigure(0, weight=3)
         self.rowconfigure(0, weight=4)
@@ -215,6 +215,4 @@ class MenuFrame(FrameManager.Frame):
         )
     
     def __on_start(self):
-        from frames.quiz import QuizFrame
-        
-        self.manager.add(QuizFrame)
+        self.manager.show(FrameType.QUIZ)

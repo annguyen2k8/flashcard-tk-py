@@ -4,9 +4,9 @@ import functools
 import tkinter as tk
 from typing import Dict, List, Type
 
+import frames
 from core.window import Window
-from frames import MenuFrame
-from managers import FrameManager
+from managers import FrameManager, FrameType
 from ui import Frame
 from utils import Appdata, report_callback_exception
 
@@ -18,10 +18,9 @@ class App(Window):
         self.title = "Flashcard - JALT"
         self.resizable = False
 
-        
-
         self.frame_manager = FrameManager(self)
-        self.frame_manager.add(MenuFrame)
-
+        
+        self.frame_manager.show(FrameType.MENU)
+        
     def mainloop(self, n: int = 0):
         return super().mainloop(n)
