@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Optional, Tuple, Union
 if TYPE_CHECKING:
     from app import App
 
+
 class Frame(ttk.Frame):
     def __init__(
         self, master: Optional[Union[tk.Misc, App]] = None, *,

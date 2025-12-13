@@ -1,7 +1,7 @@
 import tkinter as tk
 from typing import Callable, List, Optional
 
-from ui import Button, Frame
+from ui.widgets import Button, Frame
 
 
 class VerticalButtons(Frame):

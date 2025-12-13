@@ -4,10 +4,8 @@ import functools
 import tkinter as tk
 from typing import Dict, List, Type
 
-import frames
-from core.window import Window
 from managers import FrameManager, FrameType
-from ui import Frame
+from ui.window import Window
 from utils import Appdata, report_callback_exception
 
 

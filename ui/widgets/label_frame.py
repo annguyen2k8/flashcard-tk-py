@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import ttk
 from typing import Optional
 
-from .label import Label
+from ui.widgets.label import Label
 
 
 class LabelFrame(ttk.LabelFrame, Label):

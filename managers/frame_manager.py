@@ -4,7 +4,7 @@ import tkinter as tk
 from enum import Enum, auto
 from typing import Dict, List, Optional, Type, overload
 
-from ui import Frame
+from ui.widgets import Frame
 from utils import ignore_keyerror
 
 

@@ -6,8 +6,8 @@ import tkinter.filedialog as fd
 from typing import Any, Callable, List, Optional, Tuple
 
 from managers import FrameManager, FrameType
-from ui import Button, Entry, Frame, ScrollBar, TreeView
 from ui.buttons import HorizontalButtons, VerticalButtons
+from ui.widgets import Button, Entry, Frame, ScrollBar, TreeView
 
 # from utils import Appdata
 

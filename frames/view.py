@@ -6,7 +6,7 @@ from tkinter.messagebox import askyesno, showinfo
 from typing import Callable, Dict, List, Optional, Tuple
 
 from managers import FrameManager, FrameType
-from ui import Button, Entry, Frame, Label, LabelFrame
+from ui.widgets import Button, Entry, Frame, Label, LabelFrame
 
 
 class ViewFrame(FrameManager.Frame):
