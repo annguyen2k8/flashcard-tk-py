@@ -10,7 +10,7 @@ from ui.buttons import HorizontalButtons, VerticalButtons
 from ui.widgets import Button, Entry, Frame, ScrollBar, TreeView
 
 
-class ManagerView(TreeView):
+class EditorDeckView(TreeView):
     def __init__(self, master: Optional[tk.Misc]):
         super().__init__(master, columns=("question", "answer"), show="headings")
 
@@ -66,7 +66,6 @@ class ManagerView(TreeView):
 
         self.selected_col = None
         self.entry.clear()
-        # self.appdata.save(self.items)
 
     def __on_focus_entry(self, event: tk.Event):
         item_id = self.selected_item
@@ -144,27 +143,21 @@ class ManagerView(TreeView):
             self.insert_item(values)
 
 class MenuFrame(FrameManager.Frame):
-    # appdata: Appdata = Appdata("jalt")
     def __init__(self, manager: FrameManager, *args, **kwargs):
         super().__init__(manager, FrameType.MENU, *args, **kwargs)
         
         self.columnconfigure(0, weight=3)
         self.rowconfigure(0, weight=4)
 
-        self.editor = ManagerView(self)
+        self.editor = EditorDeckView(self)
         self.editor.grid(column=1, row=0, padx=10, pady=10)
-
-        # NOTE: I will improve* this UI soon!
-
-        # self.scrollbar = ScrollBar(self, orient=tk.VERTICAL, command=sdelf.manager.yview)
-        # self.manager.configure(yscrollcommand=self.scrollbar.set)
-        # self.scrollbar.grid(column=0, row=0, padx=10, pady=50, ipady=50, sticky=tk.NS)
         
         # Right frame
         self.rframe = HorizontalButtons(self)
         self.rframe.add_button("Start Now", self.__on_start)
         self.rframe.add_button("Import", self.__on_import)
         self.rframe.add_button("Export", self.__on_export)
+        self.rframe.add_button("License", lambda: ...)
         self.rframe.add_button("Help", lambda: ...)
         self.rframe.grid(column=2, row=0, padx=5, pady=10, ipadx=2.5, sticky=tk.N)
 
