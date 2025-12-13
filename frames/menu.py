@@ -9,15 +9,10 @@ from managers import FrameManager, FrameType
 from ui.buttons import HorizontalButtons, VerticalButtons
 from ui.widgets import Button, Entry, Frame, ScrollBar, TreeView
 
-# from utils import Appdata
-
 
 class ManagerView(TreeView):
     def __init__(self, master: Optional[tk.Misc]):
         super().__init__(master, columns=("question", "answer"), show="headings")
-
-        # self.appdata = master.appdata
-        # self.set_items(self.appdata.load_save())
 
         # self.bind(
         #     "<Double-1>",
