@@ -1,2 +1,2 @@
-class QuizType:
-    pass>
+class CardType:
+    pass

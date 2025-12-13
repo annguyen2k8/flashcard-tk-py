@@ -1,2 +1,2 @@
-class Quiz:
+class Card:
     pass

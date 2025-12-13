@@ -1,7 +1,7 @@
-from .quiz import Quiz
-from .quiz_type import QuizType
+from .card import Card
+from .card_type import CardType
 
 __all__ = [
-    "QuizType",
-    "Quiz"
+    "CardType",
+    "Card"
 ]
