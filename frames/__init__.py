@@ -1,7 +1,7 @@
 from .menu import MenuFrame
-from .quiz import QuizFrame
+from .view import ViewFrame
 
 __all__ = [
     "MenuFrame",
-    "QuizFrame"
+    "ViewFrame"
 ]

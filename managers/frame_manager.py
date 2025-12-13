@@ -10,7 +10,7 @@ from utils import ignore_keyerror
 
 class FrameType(Enum):
     MENU = auto()
-    QUIZ = auto()
+    VIEW = auto()
 
 class FrameManager:
     class Frame(Frame):

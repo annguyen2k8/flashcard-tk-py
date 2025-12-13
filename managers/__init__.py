@@ -1,7 +1,7 @@
 from .frame_manager import FrameManager, FrameType
-from .quiz_manager import QuizManager
+from .card_manager import CardManager
 
 __all__ = [
     "FrameManager", "FrameType",
-    "QuizManager",
+    "CardManager",
 ]

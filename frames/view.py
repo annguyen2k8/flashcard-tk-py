@@ -9,13 +9,13 @@ from managers import FrameManager, FrameType
 from ui import Button, Entry, Frame, Label, LabelFrame
 
 
-class QuizFrame(FrameManager.Frame):
+class ViewFrame(FrameManager.Frame):
     __questions: List[Tuple[str, ...]]
     __index: int
     __results: Dict[int, Optional[str]]
     
     def __init__(self, manager: FrameManager, *args, **kwargs):
-        super().__init__(manager, FrameType.QUIZ,*args, **kwargs)
+        super().__init__(manager, FrameType.VIEW,*args, **kwargs)
         
         Button(
             self, text="Quit", 

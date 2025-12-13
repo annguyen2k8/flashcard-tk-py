@@ -215,4 +215,4 @@ class MenuFrame(FrameManager.Frame):
         )
     
     def __on_start(self):
-        self.manager.show(FrameType.QUIZ)
+        self.manager.show(FrameType.VIEW)
