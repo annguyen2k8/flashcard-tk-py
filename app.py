@@ -6,7 +6,7 @@ from typing import Dict, List, Type
 
 from managers import FrameManager, FrameType
 from ui.window import Window
-from utils import Appdata, report_callback_exception
+from utils import report_callback_exception
 
 
 class App(Window):
