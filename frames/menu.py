@@ -154,11 +154,11 @@ class MenuFrame(FrameManager.Frame):
         
         # Right frame
         self.rframe = HorizontalButtons(self)
-        self.rframe.add_button("Start Now", self.__on_start)
-        self.rframe.add_button("Import", self.__on_import)
-        self.rframe.add_button("Export", self.__on_export)
-        self.rframe.add_button("License", lambda: ...)
-        self.rframe.add_button("Help", lambda: ...)
+        self.rframe.add_button("Start Now"  , self.__on_start)
+        self.rframe.add_button("Import"     , self.__on_import)
+        self.rframe.add_button("Export"     , self.__on_export)
+        self.rframe.add_button("License"    , self.__on_license)
+        self.rframe.add_button("Help"       , lambda: ...)
         self.rframe.grid(column=2, row=0, padx=5, pady=10, ipadx=2.5, sticky=tk.N)
 
         # Bottom frame
@@ -172,7 +172,7 @@ class MenuFrame(FrameManager.Frame):
     defaultextension: str = "*.jalt.json"
 
     def __on_import(self):
-        pass
+        return
     
         filename = fd.askopenfilename(
             title="Import a file",
@@ -186,7 +186,7 @@ class MenuFrame(FrameManager.Frame):
         self.manager.set_items(items)
 
     def __on_export(self):
-        pass
+        return
         
         filename = fd.asksaveasfilename(
             title="Export a file",
@@ -204,3 +204,6 @@ class MenuFrame(FrameManager.Frame):
     
     def __on_start(self):
         self.manager.show(FrameType.VIEW)
+    
+    def __on_license(self):
+        self.manager.show(FrameType.LICENSE)
