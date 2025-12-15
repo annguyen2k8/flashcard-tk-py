@@ -18,6 +18,6 @@ class TreeView(ttk.Treeview):
             show=show,
             **kwargs
         )
+        
         for column in columns:
             self.heading(column, text=column.title())
-    

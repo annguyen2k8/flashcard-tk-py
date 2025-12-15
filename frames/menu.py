@@ -7,10 +7,11 @@ from typing import Any, Callable, List, Optional, Tuple
 
 from managers import FrameManager, FrameType
 from ui.buttons import HorizontalButtons, VerticalButtons
-from ui.widgets import Button, Entry, Frame, ScrollBar, TreeView
+from ui.widgets import Button, Entry, Frame, ScrollBar
+from ui.widgets.scrolled_treeview import ScrolledTreeView
 
 
-class EditorDeckView(TreeView):
+class EditorDeckView(ScrolledTreeView):
     def __init__(self, master: Optional[tk.Misc]):
         super().__init__(master, columns=("question", "answer"), show="headings")
 
@@ -30,21 +31,22 @@ class EditorDeckView(TreeView):
             validate="key",
             validatecommand=(self.register(self.__validate), "%P"),
         )
+        
         self.entry.grid(column=1, row=1, sticky=tk.EW, padx=10, pady=10)
         self.entry.focus_set()
 
         self.entry.bind("<FocusIn>", self.__on_focus_entry)
         self.entry.bind("<Return>", self.__on_return)
 
-        self.bind("<ButtonPress-1>", self.__on_click)
-        self.bind("<Delete>", self.__on_delete)
+        self.treeview.bind("<ButtonPress-1>", self.__on_click)
+        self.treeview.bind("<Delete>", self.__on_delete)
 
     def __on_click(self, event: tk.Event):
-        column = self.identify_column(event.x)
+        column = self.treeview.identify_column(event.x)
 
         if not column:
             for item_id in self.selection():
-                self.selection_remove(item_id)
+                self.treeview.selection_remove(item_id)
                 self.selected_col = None
             return
 
@@ -52,17 +54,17 @@ class EditorDeckView(TreeView):
         self.entry.focus()
 
     def __on_delete(self, event: tk.Event):
-        selected_items = self.selection()
+        selected_items = self.treeview.selection()
         if not selected_items:
             return
-        items = self.get_children()
+        items = self.treeview.get_children()
         iitem = items.index(self.selected_item)
 
         for item_id in selected_items:
             self.delete_item(item_id)
 
         if len(self.items) > iitem:
-            self.selection_add(self.get_children()[iitem])
+            self.treeview.selection_add(self.treeview.get_children()[iitem])
 
         self.selected_col = None
         self.entry.clear()
@@ -82,11 +84,11 @@ class EditorDeckView(TreeView):
 
         if not (self.selected_col and self.selected_item):
             item_id = self.insert_item((self.entry.get(), ""))
-            self.selection_set(item_id)
+            self.treeview.selection_set(item_id)
             self.selected_col = 1
             self.__on_focus_entry(event)
         else:
-            self.selection_remove(self.selected_item)
+            self.treeview.selection_remove(self.selected_item)
             self.selected_col = None
 
         self.entry.clear()
@@ -101,37 +103,37 @@ class EditorDeckView(TreeView):
         values = list(self.get_item(item_id))
         values[self.selected_col] = new_value
 
-        self.item(item_id, values=tuple(values))
+        self.set_item(item_id, values=tuple(values))
 
         return True
 
     @property
     def length(self) -> int:
-        return len(self.get_children())
+        return len(self.treeview.get_children())
 
     @property
     def items(self) -> List[Tuple[str, ...]]:
-        return [tuple(self.item(row, "values")) for row in self.get_children()]
+        return [tuple(self.treeview.item(row, "values")) for row in self.treeview.get_children()]
 
     @property
     def selected_item(self) -> str:
-        items = self.selection()
+        items = self.treeview.selection()
         if not items:
             return ""
         return items[-1]
 
     def set_item(self, item_id: str, values: Tuple[Any, ...]):
-        self.item(item_id, values=values)
+        self.treeview.item(item_id, values=values)
 
     def get_item(self, item_id: str) -> Tuple[Any, ...]:
-        values = tuple(self.item(item_id, "values"))
+        values = tuple(self.treeview.item(item_id, "values"))
         return values if values else ("", "")
 
     def insert_item(self, values: Tuple[Any, ...]) -> str:
-        return self.insert("", tk.END, values=values)
+        return self.treeview.insert("", tk.END, values=values)
 
     def delete_item(self, item_id: str):
-        self.delete(item_id)
+        self.treeview.delete(item_id)
 
     def clear_items(self):
         for item_id in self.get_children():
