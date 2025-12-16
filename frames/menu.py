@@ -29,7 +29,7 @@ class LicenseDialog(TopLevel):
         
         Button(
             self, 
-            text="OK! GOT IT!!!",
+            text="OK, I got it ¯\_('-')_/¯",
             command=self.destroy
         ).pack(
             padx=10, pady=10, anchor=tk.SE
