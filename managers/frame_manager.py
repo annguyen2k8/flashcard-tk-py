@@ -9,7 +9,6 @@ from utils import ignore_keyerror
 
 
 class FrameType(Enum):
-    LICENSE     = auto()
     MENU        = auto()
     VIEW        = auto()
 

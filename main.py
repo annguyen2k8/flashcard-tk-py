@@ -8,3 +8,5 @@ if __name__ == "__main__":
         app.mainloop()
     except Exception as error:
         pass
+
+from tkinter import Toplevel

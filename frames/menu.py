@@ -7,9 +7,42 @@ from typing import Any, Callable, List, Optional, Tuple
 
 from managers import FrameManager, FrameType
 from ui.buttons import HorizontalButtons, VerticalButtons
+from ui.toplevel import TopLevel
 from ui.widgets import Button, Entry, Frame, ScrollBar
+from ui.widgets.scrolled_text import ScrolledText
 from ui.widgets.scrolled_treeview import ScrolledTreeView
 
+
+class LicenseDialog(TopLevel):
+    def __init__(self, master: Optional[tk.Misc] = None):
+        super().__init__(master)
+        
+        self.title = "LICENSE"
+        
+        self.scrolled_text = ScrolledText(
+            self, wrap=tk.WORD
+        )
+        
+        self.scrolled_text.pack(
+            padx=10, pady=10
+        )
+        
+        Button(
+            self, 
+            text="OK! GOT IT!!!",
+            command=self.destroy
+        ).pack(
+            padx=10, pady=10, anchor=tk.SE
+        )
+        
+        for chars in self.read_license():
+            self.scrolled_text.text.insert(tk.END, chars)
+        
+        self.scrolled_text.text.config(state=tk.DISABLED)
+        
+    def read_license(self, filename: str = "LICENSE") -> List[bytes]:
+        with open(filename, "r") as fp:
+            return fp.readlines()
 
 class EditorDeckView(ScrolledTreeView):
     def __init__(self, master: Optional[tk.Misc]):
@@ -208,4 +241,4 @@ class MenuFrame(FrameManager.Frame):
         self.manager.show(FrameType.VIEW)
     
     def __on_license(self):
-        self.manager.show(FrameType.LICENSE)
+        LicenseDialog(self)

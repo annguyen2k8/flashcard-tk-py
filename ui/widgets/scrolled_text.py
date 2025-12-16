@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import tkinter as tk
 from tkinter import ttk
-from typing import Optional
+from typing import Literal, Optional
 
 from ui.widgets import Frame
 
@@ -11,13 +11,16 @@ class ScrolledText(Frame):
     def __init__(
         self, master: Optional[tk.Misc] = None, *,
         wrap: Literal["none", "char", "word"] = "none",
+        width: int = 55,
+        height: int = 15,
+        state: Literal["normal", "disabled"] = tk.NORMAL,
         **kwargs
     ) -> None:
         super().__init__(master)
         
         self.grid_columnconfigure(0, weight=1)
         
-        self.text = tk.Text(self, wrap=wrap)
+        self.text = tk.Text(self, wrap=wrap, width=width, height=height, state=state)
         
         self.scrollbar = ttk.Scrollbar(
             self,

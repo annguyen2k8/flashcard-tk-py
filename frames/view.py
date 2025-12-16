@@ -15,7 +15,7 @@ class ViewFrame(FrameManager.Frame):
     __results: Dict[int, Optional[str]]
     
     def __init__(self, manager: FrameManager, *args, **kwargs):
-        super().__init__(manager, FrameType.VIEW,*args, **kwargs)
+        super().__init__(manager, FrameType.VIEW, *args, **kwargs)
         
         Button(
             self, text="Quit", 
