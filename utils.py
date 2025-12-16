@@ -38,7 +38,7 @@ def report_callback_exception(
     sys.stdout.write(message)
     
     showerror(
-        title=exc_type.__name__,
+        title="Oops?! What's an error?",
         message=message
         )
 
